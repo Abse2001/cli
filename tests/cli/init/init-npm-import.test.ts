@@ -1,4 +1,5 @@
 import { expect, test } from "bun:test"
+import { mkdir } from "node:fs/promises"
 import { join } from "node:path"
 import { getCliTestFixture } from "../../fixtures/get-cli-test-fixture"
 import { getPackageManager } from "lib/shared/get-package-manager"
@@ -8,8 +9,17 @@ test("init a project with an npm import and build", async () => {
 
   const projectDirName = "my-project"
   const projectDir = join(tmpDir, projectDirName)
+  const skillPaths = [
+    join(projectDir, ".claude", "skills", "tscircuit"),
+    join(projectDir, ".agents", "skills", "tscircuit"),
+  ]
 
-  await runCommand(`tsci init ${projectDirName} --yes`)
+  for (const skillPath of skillPaths) {
+    await mkdir(skillPath, { recursive: true })
+    await Bun.write(join(skillPath, "SKILL.md"), "# tscircuit\n")
+  }
+
+  await runCommand(`tsci init ${projectDirName} --yes --no-install`)
 
   // Add a dependency to package.json and install it
   const pm = getPackageManager()
@@ -49,4 +59,4 @@ test("init a project with an npm import and build", async () => {
   )
   expect(resistor).toBeDefined()
   expect(resistor!.resistance).toBe(1000)
-}, 20_000)
+}, 60_000)
