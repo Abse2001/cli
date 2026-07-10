@@ -24,10 +24,6 @@ export interface CheckShortsResult {
   }>
 }
 
-const checkShortsPackageName = ["@tscircuit", "check-shorts"].join("/")
-
-const loadCheckShorts = async () => await import(checkShortsPackageName)
-
 const parsePixelsPerMm = (value?: string): number | undefined => {
   if (!value) return undefined
   const parsedValue = Number(value)
@@ -71,6 +67,12 @@ export const checkShorts = async (
   file?: string,
   options: CheckShortsOptions = {},
 ): Promise<CheckShortsResult> => {
+  const {
+    appendBitmapLegend,
+    createShortDebugSvg,
+    encodeRgbaPng,
+    renderBitmapShortDebug,
+  } = await import("@tscircuit/check-shorts")
   const resolvedInputFilePath = await resolveCheckInputFilePath(file)
   const mode = parseMode(options.mode)
   const layerOption = parseLayer(options.layer)
@@ -87,13 +89,6 @@ export const checkShorts = async (
     } satisfies PlatformConfig,
     allowPrebuiltCircuitJson: true,
   })
-  const {
-    appendBitmapLegend,
-    createShortDebugSvg,
-    encodeRgbaPng,
-    renderBitmapShortDebug,
-  } = await loadCheckShorts()
-
   const debugRenders = await Promise.all(
     layers.map((layer) =>
       renderBitmapShortDebug(circuitJson, {

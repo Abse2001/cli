@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test"
-import { appendCopperBridgeTrace } from "@tscircuit/check-shorts"
+import type { AnyCircuitElement, PcbTrace } from "circuit-json"
 import { mkdir, readFile, rm, stat, symlink, writeFile } from "node:fs/promises"
 import path from "node:path"
 import { temporaryDirectory } from "tempy"
@@ -24,12 +24,28 @@ const makeCircuitJsonWithShort = async (circuitPath: string) => {
       routingDisabled: true,
     },
   })
+  const bridgeTrace: PcbTrace = {
+    type: "pcb_trace",
+    pcb_trace_id: "pcb_trace_short_bridge",
+    route: [
+      {
+        route_type: "wire",
+        x: -2.2,
+        y: 0,
+        width: 0.25,
+        layer: "top",
+      },
+      {
+        route_type: "wire",
+        x: 2.2,
+        y: 0,
+        width: 0.25,
+        layer: "top",
+      },
+    ],
+  }
 
-  return appendCopperBridgeTrace(circuitJson, {
-    start: { x: -2.2, y: 0 },
-    end: { x: 2.2, y: 0 },
-    width: 0.25,
-  })
+  return [...circuitJson, bridgeTrace] satisfies AnyCircuitElement[]
 }
 
 const linkWorkspaceNodeModules = async (tmpDir: string) => {

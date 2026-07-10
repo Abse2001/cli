@@ -21,6 +21,7 @@ const result = await Bun.build({
     "tscircuit",
     "typescript",
     "circuit-to-svg",
+    "@tscircuit/check-shorts",
     "@types/*",
     "react",
     "react-dom",
