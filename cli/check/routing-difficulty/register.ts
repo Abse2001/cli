@@ -4,6 +4,8 @@ import type { Command } from "commander"
 import path from "node:path"
 import { getCircuitJsonForCheck, resolveCheckInputFilePath } from "../shared"
 
+type RoutingAnalysisCircuitJson = Parameters<typeof analyzeRouting>[0]
+
 export const checkRoutingDifficulty = async (file?: string) => {
   const resolvedInputFilePath = await resolveCheckInputFilePath(file)
   const circuitJson = await getCircuitJsonForCheck({
@@ -15,7 +17,9 @@ export const checkRoutingDifficulty = async (file?: string) => {
     allowPrebuiltCircuitJson: true,
   })
 
-  const analysis = await analyzeRouting(circuitJson)
+  const analysis = await analyzeRouting(
+    circuitJson as RoutingAnalysisCircuitJson,
+  )
   const result = analysis.getString()
   if (!result) {
     return `No congested regions in ${path.basename(resolvedInputFilePath)}`

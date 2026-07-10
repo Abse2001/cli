@@ -5,6 +5,8 @@ import { analyzeRouting } from "@tscircuit/circuit-json-routing-analysis"
 import { getCircuitJsonForCheck } from "../../../cli/check/shared"
 import { getCliTestFixture } from "../../fixtures/get-cli-test-fixture"
 
+type RoutingAnalysisCircuitJson = Parameters<typeof analyzeRouting>[0]
+
 const circuitCode = `
 export default () => (
   <board width="20mm" height="10mm" routingDisabled>
@@ -32,7 +34,11 @@ test("tsci check routing-difficulty prints only routing-analysis output", async 
         routingDisabled: true,
       },
     })
-    const expected = (await analyzeRouting(circuitJson)).getString().trim()
+    const expected = (
+      await analyzeRouting(circuitJson as RoutingAnalysisCircuitJson)
+    )
+      .getString()
+      .trim()
 
     const { stdout, stderr, exitCode } = await runCommand(
       `tsci check routing-difficulty ${circuitPath}`,
